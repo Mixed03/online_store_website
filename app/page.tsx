@@ -1,7 +1,8 @@
 // app/page.tsx
 import ProductCard from "@/components/ProductCard";
 import { products } from "@/lib/products";
-import { Search, Home as HomeIcon, Bell, ShoppingCart, User } from "lucide-react"; // Import necessary icons
+import { Search } from "lucide-react"; // Import necessary icons
+// import { Search, Home as HomeIcon, Bell, ShoppingCart, User } from "lucide-react";
 
 export default function Home() {
   return (

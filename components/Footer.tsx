@@ -1,6 +1,7 @@
 // components/Footer.tsx
 "use client";
-import { Home as HomeIcon, ShoppingBag, ShoppingCart, User } from "lucide-react";
+import { Home as HomeIcon, ShoppingCart } from "lucide-react";
+// import { Home as HomeIcon, ShoppingBag, ShoppingCart, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation"; // To get current path for active state
 

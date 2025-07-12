@@ -1,7 +1,8 @@
 // checkout/page.tsx
 "use client";
 import { useCartStore } from "../../lib/cartStore";
-import { ChevronLeft, MoreHorizontal, MapPin, ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronLeft, ChevronDown, ChevronUp } from "lucide-react";
+// import { MoreHorizontal, MapPin} from "lucide-react";
 import { useState } from "react";
 
 export default function CheckoutPage() {

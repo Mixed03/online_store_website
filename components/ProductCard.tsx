@@ -1,7 +1,8 @@
 // components/ProductCard.tsx
 "use client";
 import Link from "next/link";
-import { Star, Heart } from "lucide-react";
+import { Star } from "lucide-react";
+// import { Star, Heart } from "lucide-react";
 
 type ProductProps = {
     id: string;

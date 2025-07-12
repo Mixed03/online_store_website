@@ -6,7 +6,8 @@ import SizeSelector from "./SizeSelector";
 import ColorSelector from "./ColorSelector";
 import QuantitySelector from "./QuantitySelector";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, Heart, Star } from "lucide-react";
+import { ChevronLeft, Star } from "lucide-react";
+// import { ChevronLeft, Heart, Star } from "lucide-react";
 
 type Product = {
   id: string;
