@@ -1,6 +1,5 @@
-// lib/cartStore.ts
 import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware"; // Import persist and createJSONStorage
+import { persist, createJSONStorage } from "zustand/middleware";
 
 type CartItem = {
   id: string;
@@ -17,9 +16,10 @@ type Store = {
   addToCart: (item: CartItem) => void;
   removeFromCart: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
+  clearCart: () => void;
 };
 
-export const useCartStore = create<Store>()( // Use the new syntax for create with middleware
+export const useCartStore = create<Store>()(
   persist(
     (set) => ({
       cart: [],
@@ -45,10 +45,11 @@ export const useCartStore = create<Store>()( // Use the new syntax for create wi
         set((state) => ({
           cart: state.cart.map((i) => (i.id === id ? { ...i, quantity } : i)),
         })),
+      clearCart: () => set({ cart: [] }),
     }),
     {
-      name: "cart-storage", // unique name for the storage key
-      storage: createJSONStorage(() => localStorage), // (optional) by default, 'localStorage' is used
+      name: "cart-storage",
+      storage: createJSONStorage(() => localStorage),
     }
   )
 );

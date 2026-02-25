@@ -1,34 +1,31 @@
-// checkout/page.tsx
 "use client";
 import { useCartStore } from "../../lib/cartStore";
 import { ChevronLeft, ChevronDown, ChevronUp } from "lucide-react";
-// import { MoreHorizontal, MapPin} from "lucide-react";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function CheckoutPage() {
   const cart = useCartStore((state) => state.cart);
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const { clearCart } = useCartStore();
+  const router = useRouter();
 
-  // State to control the visibility of the shipping address form
   const [isShippingAddressFormOpen, setIsShippingAddressFormOpen] = useState(true);
-
-  // State for form fields
   const [fullName, setFullName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [branchName, setBranchName] = useState("");
   const [villageStreet, setVillageStreet] = useState("");
   const [district, setDistrict] = useState("");
   const [provinceCity, setProvinceCity] = useState("");
-  const [errorMessage, setErrorMessage] = useState(""); // State for displaying validation errors
+  const [errorMessage, setErrorMessage] = useState("");
 
   const toggleShippingAddressForm = () => {
     setIsShippingAddressFormOpen(!isShippingAddressFormOpen);
   };
 
   const handleContinueToPayment = (e: React.FormEvent) => {
-    e.preventDefault(); // Prevent default form submission
+    e.preventDefault();
 
-    // Basic form validation
     if (!fullName || !phoneNumber || !branchName || !villageStreet || !district || !provinceCity) {
       setErrorMessage("Please fill in all required shipping address fields.");
       return;
@@ -39,9 +36,8 @@ export default function CheckoutPage() {
       return;
     }
 
-    setErrorMessage(""); // Clear any previous error messages
+    setErrorMessage("");
 
-    // Construct the order summary message
     let orderSummary = "Customer Order Summary:\n\n";
     orderSummary += "--- Shipping Information ---\n";
     orderSummary += `Full Name: ${fullName}\n`;
@@ -59,44 +55,43 @@ export default function CheckoutPage() {
       orderSummary += `   Size: ${item.size}\n`;
       orderSummary += `   Price: $${item.price.toFixed(2)} each\n`;
       orderSummary += `   Subtotal: $${(item.price * item.quantity).toFixed(2)}\n`;
+      orderSummary += `   Image: ${item.image}\n`;
       orderSummary += "---\n";
     });
 
     orderSummary += `Total Order Price: $${total.toFixed(2)}\n\n`;
     orderSummary += "Thank you for your order!";
 
-    // Encode the message for URL
     const encodedMessage = encodeURIComponent(orderSummary);
-    const whatsappNumber = "8562091616578"; // WhatsApp number without '+'
+    const whatsappNumber = "8562091616578";
     const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
 
-    // Open WhatsApp link
     window.open(whatsappUrl, "_blank");
+    clearCart(); // Reset cart ทันทีหลังเปิด WhatsApp
+    router.push("/"); // Redirect กลับ Home
   };
 
   return (
     <div className="max-w-xl mx-auto min-h-screen flex flex-col pb-6">
-      {/* Header */}
-      <div className="fixed top-0 inset-x-0 z-50 max-w-xl mx-auto flex items-center gap-2 p-4 bg-white/10 backdrop-blur-md">
+      {/* Fixed Header */}
+      <div className="fixed top-0 inset-x-0 z-50 max-w-xl mx-auto flex items-center gap-2 p-4 bg-white/70 backdrop-blur-md">
         <a href="/cart" className="text-gray-600">
           <ChevronLeft size={20} />
         </a>
         <h1 className="text-lg font-medium text-gray-800">Checkout</h1>
       </div>
 
-      {/* Spacer to offset fixed header */}
+      {/* Spacer */}
       <div className="h-14" />
 
-      {/* Error Message Display */}
+      {/* Error Message */}
       {errorMessage && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mx-4 mt-4" role="alert">
           <span className="block sm:inline">{errorMessage}</span>
         </div>
       )}
 
-      
-
-      {/* Checkout Content - Added flex-grow and pb-28 for fixed bottom button */}
+      {/* Checkout Content */}
       <div className="flex-grow p-4 space-y-4 pb-44 overflow-y-auto">
         {/* Shipping Address Card */}
         <div className="bg-white rounded-xl shadow-sm p-4">
@@ -112,10 +107,8 @@ export default function CheckoutPage() {
             )}
           </div>
 
-          {/* Shipping Address Form Fields - Conditionally rendered */}
           {isShippingAddressFormOpen && (
             <div className="space-y-4">
-              {/* Contact Information */}
               <div>
                 <h3 className="font-medium text-gray-800 mb-2">Contact Information</h3>
                 <div className="space-y-3">
@@ -150,7 +143,6 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
-              {/* Shipping Address */}
               <div>
                 <h3 className="font-medium text-gray-800 mb-2">Shipping Address</h3>
                 <div className="space-y-3">
@@ -216,10 +208,8 @@ export default function CheckoutPage() {
           )}
         </div>
 
-        {/* Order List Header */}
         <h2 className="font-semibold text-gray-800 mt-6 mb-2">Order List</h2>
 
-        {/* Order Items */}
         <div className="space-y-3">
           {cart.length === 0 ? (
             <p className="text-center text-gray-500 mt-10">Your cart is empty.</p>
@@ -243,15 +233,13 @@ export default function CheckoutPage() {
         </div>
       </div>
 
-      {/* Fixed Bottom Total Price and "Continue to Payment" Button */}
+      {/* Fixed Bottom Bar */}
       <div className="fixed bottom-16 inset-x-0 z-40 max-w-xl mx-auto px-4">
-        <div className="left-4 right-4 z-10 bg-white shadow-lg rounded-2xl p-4 border-t border-gray-100">
-          {/* Total Price */}
+        <div className="bg-white shadow-lg rounded-2xl p-4 border-t border-gray-100">
           <div className="flex justify-between items-center mb-4">
             <span className="text-lg font-bold text-gray-900">Total:</span>
             <span className="text-lg font-bold text-gray-900">${total.toFixed(2)}</span>
           </div>
-          {/* Continue to Payment Button */}
           <button
             onClick={handleContinueToPayment}
             className="w-full bg-black text-white py-3 rounded-lg text-base font-medium flex items-center justify-center gap-2 shadow-md"
@@ -259,7 +247,6 @@ export default function CheckoutPage() {
             Continue to Payment
             <ChevronLeft size={16} className="rotate-180" />
           </button>
-
         </div>
       </div>
     </div>
