@@ -49,15 +49,15 @@ export default function CartPage() {
   return (
     <div className="max-w-xl mx-auto pb-10 min-h-screen flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between p-4">
-        <div className="flex items-center gap-2">
-          {/* Back button now dynamically navigates to previous product or homepage */}
-          <Link href={backLinkHref} className="text-gray-600">
-            <ChevronLeft size={20} />
-          </Link>
-          <h1 className="text-lg font-medium text-gray-800">Cart</h1>
-        </div>
+      <div className="fixed top-0 inset-x-0 z-50 max-w-xl mx-auto flex items-center gap-2 p-4 bg-white/10 backdrop-blur-md">
+        <Link href={backLinkHref} className="text-gray-600">
+          <ChevronLeft size={20} />
+        </Link>
+        <h1 className="text-lg font-medium text-gray-800">Cart</h1>
       </div>
+
+      {/* Spacer to offset fixed header */}
+      <div className="h-14" />
 
       {/* Cart Items - Adjusted padding-bottom to account for both fixed bars */}
       {/* Footer height is h-16 (4rem), Checkout bar height is approx. 3.5rem. */}

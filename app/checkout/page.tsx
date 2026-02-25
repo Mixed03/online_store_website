@@ -77,16 +77,15 @@ export default function CheckoutPage() {
   return (
     <div className="max-w-xl mx-auto min-h-screen flex flex-col pb-6">
       {/* Header */}
-      <div className="flex items-center justify-between p-4">
-        <div className="flex items-center gap-2">
-          {/* Back button, assuming it navigates back */}
-          <a href="/cart" className="text-gray-600">
-            <ChevronLeft size={20} />
-          </a>
-          <h1 className="text-lg font-medium text-gray-800">Checkout</h1>
-        </div>
-        {/* <MoreHorizontal size={20} className="text-gray-600" /> */}
+      <div className="fixed top-0 inset-x-0 z-50 max-w-xl mx-auto flex items-center gap-2 p-4 bg-white/10 backdrop-blur-md">
+        <a href="/cart" className="text-gray-600">
+          <ChevronLeft size={20} />
+        </a>
+        <h1 className="text-lg font-medium text-gray-800">Checkout</h1>
       </div>
+
+      {/* Spacer to offset fixed header */}
+      <div className="h-14" />
 
       {/* Error Message Display */}
       {errorMessage && (
@@ -94,6 +93,8 @@ export default function CheckoutPage() {
           <span className="block sm:inline">{errorMessage}</span>
         </div>
       )}
+
+      
 
       {/* Checkout Content - Added flex-grow and pb-28 for fixed bottom button */}
       <div className="flex-grow p-4 space-y-4 pb-44 overflow-y-auto">
@@ -243,13 +244,13 @@ export default function CheckoutPage() {
       </div>
 
       {/* Fixed Bottom Total Price and "Continue to Payment" Button */}
-      <div className="fixed bottom-16 inset-x-0 z-40 max-w-xl mx-auto px-4"> 
-      <div className="left-4 right-4 z-10 bg-white shadow-lg rounded-2xl p-4 border-t border-gray-100">
-        {/* Total Price */}
-        <div className="flex justify-between items-center mb-4">
-          <span className="text-lg font-bold text-gray-900">Total:</span>
-          <span className="text-lg font-bold text-gray-900">${total.toFixed(2)}</span>
-        </div>
+      <div className="fixed bottom-16 inset-x-0 z-40 max-w-xl mx-auto px-4">
+        <div className="left-4 right-4 z-10 bg-white shadow-lg rounded-2xl p-4 border-t border-gray-100">
+          {/* Total Price */}
+          <div className="flex justify-between items-center mb-4">
+            <span className="text-lg font-bold text-gray-900">Total:</span>
+            <span className="text-lg font-bold text-gray-900">${total.toFixed(2)}</span>
+          </div>
           {/* Continue to Payment Button */}
           <button
             onClick={handleContinueToPayment}
@@ -258,8 +259,8 @@ export default function CheckoutPage() {
             Continue to Payment
             <ChevronLeft size={16} className="rotate-180" />
           </button>
-        
-      </div>
+
+        </div>
       </div>
     </div>
   );

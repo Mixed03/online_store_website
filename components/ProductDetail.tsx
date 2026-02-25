@@ -7,7 +7,6 @@ import ColorSelector from "./ColorSelector";
 import QuantitySelector from "./QuantitySelector";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, Star } from "lucide-react";
-// import { ChevronLeft, Heart, Star } from "lucide-react";
 
 type Product = {
   id: string;
@@ -27,23 +26,21 @@ export default function ProductDetail({ product }: { product: Product }) {
   const [color, setColor] = useState(product.colors[0]);
   const [quantity, setQuantity] = useState(1);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false); // New state for success message
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [showLightbox, setShowLightbox] = useState(false); // Lightbox state
   const addToCart = useCartStore((state) => state.addToCart);
   const router = useRouter();
 
-  // Refs for swipe logic
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
-  const minSwipeDistance = 50; // Minimum pixel distance for a swipe to be registered
+  const minSwipeDistance = 50;
 
-  // Effect to save the current product ID to localStorage
   useEffect(() => {
-    if (typeof window !== "undefined" && product?.id) { // Ensure localStorage and product ID are available
+    if (typeof window !== "undefined" && product?.id) {
       localStorage.setItem("lastViewedProductId", product.id);
     }
-  }, [product.id]); // Re-run effect if product ID changes
+  }, [product.id]);
 
-  // Function to only add product to cart
   const handleAdd = () => {
     addToCart({
       id: product.id + size + color,
@@ -54,22 +51,20 @@ export default function ProductDetail({ product }: { product: Product }) {
       color,
       quantity,
     });
-    setShowSuccessMessage(true); // Show success message
+    setShowSuccessMessage(true);
     setTimeout(() => {
-      setShowSuccessMessage(false); // Hide message after 1 seconds
+      setShowSuccessMessage(false);
     }, 1000);
   };
 
-  // Function to navigate to cart page
   const handleGoToCart = () => {
     router.push("/cart");
   };
 
   const allImages = [product.image, ...(product.additionalImages || [])];
 
-  // --- Swipe Handlers ---
   const onTouchStart = (e: React.TouchEvent) => {
-    touchEndX.current = 0; // Reset on new touch
+    touchEndX.current = 0;
     touchStartX.current = e.targetTouches[0].clientX;
   };
 
@@ -78,7 +73,7 @@ export default function ProductDetail({ product }: { product: Product }) {
   };
 
   const onTouchEnd = () => {
-    if (!touchEndX.current || allImages.length <= 1) return; // No movement or single image
+    if (!touchEndX.current || allImages.length <= 1) return;
 
     const distance = touchStartX.current - touchEndX.current;
     const isLeftSwipe = distance > minSwipeDistance;
@@ -94,17 +89,16 @@ export default function ProductDetail({ product }: { product: Product }) {
       );
     }
   };
-  // --- End Swipe Handlers ---
 
   return (
     <div className="max-w-xl mx-auto pb-36">
       <div
-        className="relative overflow-hidden" // Added overflow-hidden
+        className="relative overflow-hidden"
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
       >
-        <div // This div will hold the images and allow for horizontal sliding
+        <div
           className="flex transition-transform duration-300 ease-in-out"
           style={{ transform: `translateX(-${currentImageIndex * 100}%)` }}
         >
@@ -113,29 +107,30 @@ export default function ProductDetail({ product }: { product: Product }) {
               key={index}
               src={imgSrc}
               alt={`${product.name} image ${index + 1}`}
-              className="w-full flex-shrink-0 aspect-[3/4] object-cover" // flex-shrink-0 to prevent shrinking
+              className="w-full flex-shrink-0 aspect-[3/4] object-cover cursor-pointer"
+              onClick={() => setShowLightbox(true)}
             />
           ))}
         </div>
 
-        {/* Changed onClick to navigate to the home page */}
-        <div className="absolute top-4 left-3 bg-white rounded-full p-1 shadow-sm cursor-pointer" onClick={() => router.push('/')}>
-          <ChevronLeft size={20} className="text-gray-800" />
+        {/* Back Button */}
+        <div className="fixed top-4 inset-x-0 z-50 max-w-xl mx-auto px-3 pointer-events-none">
+          <div
+            className="pointer-events-auto w-fit bg-white/70 backdrop-blur-md rounded-full p-1 shadow-sm cursor-pointer"
+            onClick={() => router.push("/")}
+          >
+            <ChevronLeft size={20} className="text-gray-800" />
+          </div>
         </div>
-        {/* Removed the Heart icon div as per the request's implied intent to remove commented code */}
-        {/* <div className="absolute top-4 right-4 bg-white rounded-full p-2 shadow-sm cursor-pointer">
-          <Heart size={20} className="text-gray-800" />
-        </div> */}
 
-        {/* Horizontal image indicators */}
+        {/* Image Indicators */}
         {allImages.length > 1 && (
           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
             {allImages.map((_, index) => (
               <div
                 key={index}
-                className={`w-4 h-4 rounded-full cursor-pointer transition-colors duration-200 ${
-                  index === currentImageIndex ? "bg-black" : "bg-gray-300"
-                }`}
+                className={`w-4 h-4 rounded-full cursor-pointer transition-colors duration-200 ${index === currentImageIndex ? "bg-black" : "bg-gray-300"
+                  }`}
                 onClick={() => setCurrentImageIndex(index)}
               ></div>
             ))}
@@ -163,36 +158,114 @@ export default function ProductDetail({ product }: { product: Product }) {
         </div>
       </div>
 
+      {/* Fixed Bottom Bar */}
       <div className="fixed bottom-16 inset-x-0 z-40 max-w-xl mx-auto px-4">
         <div className="bg-white shadow-lg rounded-2xl p-4 flex justify-between items-center border-t border-gray-100">
-        <div className="flex flex-col">
-          <span className="text-xs text-gray-500">Total price</span>
-          <span className="text-lg font-bold text-gray-900">${(product.price * quantity).toFixed(2)}</span>
-        </div>
-        <div className="flex gap-2"> {/* Added a flex container for the buttons */}
-          <button
-            className=" bg-gray-200 text-gray-800 px-4 py-3 rounded-lg text-base font-medium flex items-center justify-center shadow-md"
-            onClick={handleAdd} // Only adds to cart
-          >
-            Add to Cart
-          </button>
-          <button
-            className="bg-black text-white px-4 py-3 rounded-lg text-base font-medium flex items-center justify-center shadow-md"
-            onClick={handleGoToCart} // Navigates to cart
-          >
-            Go to Cart
-          </button>
-        </div>
+          <div className="flex flex-col">
+            <span className="text-xs text-gray-500">Total price</span>
+            <span className="text-lg font-bold text-gray-900">${(product.price * quantity).toFixed(2)}</span>
+          </div>
+          <div className="flex gap-2">
+            <button
+              className="bg-gray-200 text-gray-800 px-4 py-3 rounded-lg text-base font-medium flex items-center justify-center shadow-md"
+              onClick={handleAdd}
+            >
+              Add to Cart
+            </button>
+            <button
+              className="bg-black text-white px-4 py-3 rounded-lg text-base font-medium flex items-center justify-center shadow-md"
+              onClick={handleGoToCart}
+            >
+              Go to Cart
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Success Message Popup */}
       {showSuccessMessage && (
-        <div className="fixed inset-0 flex items-center justify-center z-[100] bg-white/30 backdrop-blur-md border border-white/20 rounded-xl shadow-md bg-opacity-30">
+        <div className="fixed inset-0 flex items-center justify-center z-[100] bg-white/30 backdrop-blur-md">
           <div className="bg-white p-4 rounded-lg shadow-xl flex items-center gap-2">
-            <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
             <span className="text-gray-800 font-medium">Item added to cart!</span>
           </div>
+        </div>
+      )}
+
+      {/* Lightbox Modal */}
+      {showLightbox && (
+        <div
+          className="fixed inset-0 z-[200] bg-black/90 flex items-center justify-center"
+          onClick={() => setShowLightbox(false)}
+          onTouchStart={(e) => {
+            touchEndX.current = 0;
+            touchStartX.current = e.targetTouches[0].clientX;
+          }}
+          onTouchMove={(e) => {
+            touchEndX.current = e.targetTouches[0].clientX;
+          }}
+          onTouchEnd={() => {
+            if (!touchEndX.current || allImages.length <= 1) return;
+            const distance = touchStartX.current - touchEndX.current;
+            if (distance > minSwipeDistance) {
+              setCurrentImageIndex((prev) => (prev === allImages.length - 1 ? 0 : prev + 1));
+            } else if (distance < -minSwipeDistance) {
+              setCurrentImageIndex((prev) => (prev === 0 ? allImages.length - 1 : prev - 1));
+            }
+          }}
+        >
+          {/* ปุ่มปิด */}
+          <button
+            className="absolute top-4 right-4 text-white bg-white/20 rounded-full p-2"
+            onClick={() => setShowLightbox(false)}
+          >
+            ✕
+          </button>
+
+          {/* รูปภาพเต็มจอ */}
+          <img
+            src={allImages[currentImageIndex]}
+            alt={product.name}
+            className="max-w-full max-h-full object-contain"
+            onClick={(e) => e.stopPropagation()}
+          />
+
+          {/* ปุ่มเลื่อนซ้าย/ขวา */}
+          {allImages.length > 1 && (
+            <>
+              <button
+                className="absolute left-3 text-white bg-white/20 rounded-full p-2"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setCurrentImageIndex((prev) => (prev === 0 ? allImages.length - 1 : prev - 1));
+                }}
+              >
+                <ChevronLeft size={24} />
+              </button>
+              <button
+                className="absolute right-3 text-white bg-white/20 rounded-full p-2"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setCurrentImageIndex((prev) => (prev === allImages.length - 1 ? 0 : prev + 1));
+                }}
+              >
+                <ChevronLeft size={24} className="rotate-180" />
+              </button>
+
+              {/* Indicator */}
+              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
+                {allImages.map((_, index) => (
+                  <div
+                    key={index}
+                    className={`w-2 h-2 rounded-full transition-colors duration-200 ${index === currentImageIndex ? "bg-white" : "bg-white/40"
+                      }`}
+                  />
+                ))}
+              </div>
+            </>
+          )}
         </div>
       )}
     </div>
